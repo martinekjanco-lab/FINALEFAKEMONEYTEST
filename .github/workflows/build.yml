@@ -42,6 +42,11 @@ jobs:
             need fabric_mod.json proj/src/main/resources/fabric.mod.json
           fi
 
+      - name: Fix the ding sound line
+        run: |
+          sed -i 's/BLOCK_NOTE_BLOCK_PLING, /BLOCK_NOTE_BLOCK_PLING.value(), /' proj/src/main/java/com/vyn/moneyui/MoneyUIClient.java
+          grep -n "PLING" proj/src/main/java/com/vyn/moneyui/MoneyUIClient.java
+
       - name: Build the mod
         working-directory: proj
         run: gradle build
