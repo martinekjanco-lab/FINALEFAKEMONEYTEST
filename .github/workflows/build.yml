@@ -1,0 +1,35 @@
+name: Build MoneyUI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.2.1
+
+      - name: Build the mod
+        run: gradle build
+
+      - name: Verify the jar has the mod inside
+        run: |
+          JAR=$(ls build/libs/moneyui-1.0.0.jar)
+          unzip -l "$JAR"
+          unzip -l "$JAR" | grep -q "fabric.mod.json" || { echo "ERROR: fabric.mod.json missing"; exit 1; }
+          unzip -l "$JAR" | grep -q "MoneyUIClient.class" || { echo "ERROR: mod code missing"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: moneyui-jar
+          path: build/libs/moneyui-1.0.0.jar
